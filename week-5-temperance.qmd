@@ -37,7 +37,7 @@ Bertrand, Marianne and Sendhil Mullainathan. 2004. "Are Emily and Greg More Empl
 
 ```{r}
 fit_call <- logistic_reg() |> 
-    fit(call ~ gender + city + ethnicity + special, data = x) 
+    fit(call ~ gender + city + ethnicity + special + quality, data = x) 
 ```
 
 ```{r}
@@ -54,11 +54,13 @@ This is my data generating mechanism.
 $$
 \begin{equation}
 \begin{aligned}
-\text{logit}(\Pr(\text{call} = 1)) =\; & -2.75 
-\; - \; 0.13 \cdot \text{male} 
-\; - \; 0.46 \cdot \text{chicago} \\
-& + \; 0.45 \cdot \text{caucasian} 
-\; + \; 0.82 \cdot \text{special}
+\text{logit}(\Pr(\text{call} = 1)) = 
+& -2.66 
+- 0.13 \cdot \text{gendermale} 
+- 0.47 \cdot \text{citychicago} \\
+& + 0.45 \cdot \text{ethnicitycauc} 
++ 0.81 \cdot \text{specialyes} 
+- 0.16 \cdot \text{qualitylow}
 \end{aligned}
 \end{equation}
 $$
