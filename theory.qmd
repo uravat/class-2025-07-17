@@ -1,0 +1,17 @@
+---
+title: "Theory"
+format: html
+---
+
+* Imagine that you are a contemporary historian studying US employment in the year 2000 in Baltimore. You want to understand the process by which some people got jobs and some did not.
+What does the population table look like? 
+
+units will be resumes that got sent to Baltimore 2000. 
+
+Columns one of them should be the treatment that we can manipulate: The years of experience whether the resume got a call back 
+
+Data: resume sent as part of experiment 
+
+Population includes both Preceptor and Data and everything else in between them. 
+
+use data to describe the population and then figure out the 

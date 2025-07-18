@@ -65,8 +65,119 @@ $$
 \end{equation}
 $$
 
+<!--
+"According to the fitted logistic regression model, applicants in Boston have a 9.7% (95% CI: 8.5%–10.9%) predicted probability of receiving a call, while applicants in Chicago have a 6.7% (95% CI: 5.8%–7.7%) predicted probability. This suggests a measurable difference in callback rates between the two cities."
+
+-->
+
 ## Temperance
 
 What are the questions you want to answer?
 
 How can you use the **marginaleffects** package to answer them?
+
+```{r}
+predictions(fit_call, type = "prob")
+```
+
+<!-- 
+
+** 9740 rows when we had 4800 resumes  Why  and what do they mean?  
+
+> predictions(fit_call, type = "prob")
+
+ Group Estimate Std. Error      z Pr(>|z|)    S  2.5 % 97.5 %
+   no    0.9448    0.00633 149.38   <0.001  Inf 0.9324 0.9572
+   no    0.9361    0.00714 131.17   <0.001  Inf 0.9221 0.9501
+   no    0.9640    0.00454 212.15   <0.001  Inf 0.9551 0.9729
+   no    0.9108    0.00990  91.96   <0.001  Inf 0.8914 0.9302
+   no    0.9361    0.00714 131.17   <0.001  Inf 0.9221 0.9501
+--- 9730 rows omitted. See ?print.marginaleffects ---
+   yes   0.1180    0.01350   8.74   <0.001 58.6 0.0915 0.1444
+   yes   0.0562    0.00685   8.20   <0.001 51.9 0.0428 0.0696
+   yes   0.0872    0.01122   7.77   <0.001 46.8 0.0652 0.1091
+   yes   0.0651    0.00786   8.28   <0.001 52.9 0.0497 0.0805
+   yes   0.0852    0.00943   9.04   <0.001 62.5 0.0668 0.1037
+Type: prob
+
+ 
+** What does 0.9448  in the output mean detail ? AI 
+
+
+-->
+
+```{r}
+tidy(predictions(fit_call, type = "prob")) # to get help from AI 
+```
+
+<!-- 
+# A tibble: 9,740 × 16
+   rowid group estimate std.error statistic p.value s.value conf.low conf.high    df
+   <int> <fct>    <dbl>     <dbl>     <dbl>   <dbl>   <dbl>    <dbl>     <dbl> <dbl>
+ 1     1 no       0.945   0.00633     149.        0     Inf    0.932     0.957   Inf
+ 2     2 no       0.936   0.00714     131.        0     Inf    0.922     0.950   Inf
+ 3     3 no       0.964   0.00454     212.        0     Inf    0.955     0.973   Inf
+ 4     4 no       0.911   0.00990      92.0       0     Inf    0.891     0.930   Inf
+ 5     5 no       0.936   0.00714     131.        0     Inf    0.922     0.950   Inf
+ 6     6 no       0.897   0.0159       56.4       0     Inf    0.866     0.928   Inf
+ 7     7 no       0.867   0.0131       66.3       0     Inf    0.841     0.893   Inf
+ 8     8 no       0.911   0.00990      92.0       0     Inf    0.891     0.930   Inf
+ 9     9 no       0.923   0.00920     100.        0     Inf    0.905     0.941   Inf
+10    10 no       0.921   0.0125       73.6       0     Inf    0.896     0.945   Inf
+# ℹ 9,730 more rows
+# ℹ 6 more variables: call <fct>, gender <chr>, city <chr>, ethnicity <chr>,
+#   special <chr>, quality <chr>
+# ℹ Use `print(n = ...)` to see more rows
+
+-->
+
+
+```{r}
+tidy(predictions(fit_call, type = "prob", by = "city"))
+```
+
+```{r}
+plot_predictions(fit_call, type = "prob", by = c("ethnicity"))
+```
+
+```{r}
+plot_predictions(fit_call, type = "prob", by = c("ethnicity", "city", "quality" ))
+```
+
+```{r}
+plot_predictions(fit_call, type = "prob", by = c("ethnicity", "city", "quality" ), draw = FALSE) # to get help from AI 
+```
+
+
+Group-wise predicted probabilities for each city category (e.g., Boston, Chicago).
+
+Standard errors and 95% confidence intervals for those probabilities, quantifying uncertainty.
+
+
+```{r}
+# Get predicted probabilities by ethnicity, city, and quality using marginaleffects
+preds <- predictions(
+  fit_call,
+  type = "prob",
+  by = c("ethnicity", "city", "quality")
+) %>%
+  as_tibble() %>%
+  filter(group == "yes")  # Keep only 'yes' probabilities
+
+```
+```{r}
+# Plot using ggplot2
+ggplot(preds, aes(x = interaction(ethnicity, quality), y = estimate, color = city)) +
+  geom_point(position = position_dodge(width = 0.5), size = 3) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
+                width = 0.2, position = position_dodge(width = 0.5)) +
+  labs(
+    title = "Call back rates for Jobs by Ethnicity, City and Resume Quality",
+    subtitle = "Boston job seekers have higher chance of receiving a call back, irrespective of ethnicity and resume quality",
+    x = "Ethnicity - Resume Quality",
+    y = "Predicted Probability of call back",
+    caption = "Source: Bertrand, Marianne and Sendhil Mullainathan. 2004. "
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
